@@ -105,6 +105,9 @@ export class Api {
   creerDepense(d: Omit<Depense, 'id'>): Observable<Depense> {
     return this.http.post<Depense>('/api/depenses', d);
   }
+  modifierDepense(d: Depense): Observable<Depense> {
+    return this.http.put<Depense>(`/api/depenses/${d.id}`, d);
+  }
   supprimerDepense(id: number): Observable<void> {
     return this.http.delete<void>(`/api/depenses/${id}`);
   }

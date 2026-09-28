@@ -18,8 +18,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/depenses')]
 class DepenseController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $em)
-    {
+    public function __construct(
+        private EntityManagerInterface $em,
+        private MembreRepository $membres,
+        private CategorieRepository $categories,
+    ) {
     }
 
     #[Route('', methods: ['GET'])]
@@ -29,20 +32,22 @@ class DepenseController extends AbstractController
     }
 
     #[Route('', methods: ['POST'])]
-    public function creer(
-        #[MapRequestPayload] DepenseInput $input,
-        MembreRepository $membres,
-        CategorieRepository $categories,
-    ): JsonResponse {
-        $payeur = $membres->find($input->payeurId) ?? throw $this->createNotFoundException('Payeur inconnu.');
-        $categorie = $categories->find($input->categorieId) ?? throw $this->createNotFoundException('Catégorie inconnue.');
-        $participants = $input->participantIds ? $membres->findBy(['id' => $input->participantIds]) : [];
-
-        $depense = new Depense(trim($input->libelle), $input->montant, $payeur, $categorie, new \DateTimeImmutable($input->date), $participants);
+    public function creer(#[MapRequestPayload] DepenseInput $input): JsonResponse
+    {
+        $depense = new Depense(...$this->valeurs($input));
         $this->em->persist($depense);
         $this->em->flush();
 
         return $this->json($depense, Response::HTTP_CREATED);
+    }
+
+    #[Route('/{id}', methods: ['PUT'])]
+    public function modifier(Depense $depense, #[MapRequestPayload] DepenseInput $input): JsonResponse
+    {
+        $depense->modifier(...$this->valeurs($input));
+        $this->em->flush();
+
+        return $this->json($depense);
     }
 
     #[Route('/{id}', methods: ['DELETE'])]
@@ -52,5 +57,15 @@ class DepenseController extends AbstractController
         $this->em->flush();
 
         return new Response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    /** Arguments de Depense::__construct() et Depense::modifier(). */
+    private function valeurs(DepenseInput $input): array
+    {
+        $payeur = $this->membres->find($input->payeurId) ?? throw $this->createNotFoundException('Payeur inconnu.');
+        $categorie = $this->categories->find($input->categorieId) ?? throw $this->createNotFoundException('Catégorie inconnue.');
+        $participants = $input->participantIds ? $this->membres->findBy(['id' => $input->participantIds]) : [];
+
+        return [trim($input->libelle), $input->montant, $payeur, $categorie, new \DateTimeImmutable($input->date), $participants];
     }
 }

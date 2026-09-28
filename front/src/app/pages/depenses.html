@@ -1,6 +1,6 @@
 <section class="carte">
-  <h2>Nouvelle dépense</h2>
-  <form class="ligne" (ngSubmit)="ajouter()" #f="ngForm">
+  <h2>{{ enEdition() === null ? 'Nouvelle dépense' : 'Modifier la dépense' }}</h2>
+  <form class="ligne" (ngSubmit)="enregistrer()" #f="ngForm">
     <label>Libellé <input name="libelle" [(ngModel)]="libelle" required /></label>
     <label>Montant (€) <input name="montant" [(ngModel)]="montant" inputmode="decimal" required pattern="^\d+([.,]\d{1,2})?$" size="8" /></label>
     <label>
@@ -20,7 +20,10 @@
       </select>
     </label>
     <label>Date <input type="date" name="date" [(ngModel)]="date" required /></label>
-    <button class="principal" [disabled]="f.invalid">Ajouter</button>
+    <button class="principal" [disabled]="f.invalid">{{ enEdition() === null ? 'Ajouter' : 'Enregistrer' }}</button>
+    @if (enEdition() !== null) {
+      <button type="button" (click)="annuler()">Annuler</button>
+    }
   </form>
   @if (membres.value()?.length) {
     <p>
@@ -66,7 +69,10 @@
               <td><span class="badge" [class]="cats()[d.categorieId]?.type">{{ cats()[d.categorieId]?.nom }}</span></td>
               <td>{{ noms()[d.payeurId] }}</td>
               <td class="nombre">{{ d.montant | euros }}</td>
-              <td><button type="button" class="discret" (click)="supprimer(d.id)" aria-label="Supprimer">✕</button></td>
+              <td>
+                <button type="button" class="discret" (click)="editer(d)" aria-label="Modifier">✎</button>
+                <button type="button" class="discret" (click)="supprimer(d.id)" aria-label="Supprimer">✕</button>
+              </td>
             </tr>
           }
         </tbody>
