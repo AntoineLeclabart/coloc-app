@@ -1,0 +1,162 @@
+:root {
+  --fond: #f6f7f9;
+  --surface: #ffffff;
+  --bord: #e2e5ea;
+  --texte: #1c2330;
+  --texte-doux: #5b6576;
+  --accent: #2f6fdb;
+  --accent-fond: #e8f0fd;
+  --positif: #1d8a4e;
+  --negatif: #c2412d;
+  --fixe: #7b5bd6;
+  --variable: #d98a1c;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #14171c;
+    --surface: #1d2129;
+    --bord: #313743;
+    --texte: #e6e9ef;
+    --texte-doux: #a0a9b8;
+    --accent: #7aa7f0;
+    --accent-fond: #22324d;
+    --positif: #5cc98b;
+    --negatif: #f0826f;
+    --fixe: #a98ff0;
+    --variable: #f0b45c;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--fond);
+  color: var(--texte);
+}
+
+section.carte {
+  background: var(--surface);
+  border: 1px solid var(--bord);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid var(--bord);
+    text-align: left;
+  }
+
+  th {
+    font-weight: 600;
+    color: var(--texte-doux);
+    font-size: 0.85rem;
+  }
+
+  .nombre {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.tableau {
+  overflow-x: auto;
+}
+
+form.ligne {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: end;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.85rem;
+    color: var(--texte-doux);
+  }
+}
+
+input,
+select,
+button {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--bord);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--texte);
+}
+
+button {
+  cursor: pointer;
+
+  &.principal {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  &.discret {
+    border: none;
+    background: none;
+    color: var(--texte-doux);
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.fixe {
+    color: var(--fixe);
+    border: 1px solid var(--fixe);
+  }
+
+  &.variable {
+    color: var(--variable);
+    border: 1px solid var(--variable);
+  }
+}
+
+.positif {
+  color: var(--positif);
+}
+
+.negatif {
+  color: var(--negatif);
+}
+
+.erreur {
+  color: var(--negatif);
+}
+
+.vide {
+  color: var(--texte-doux);
+  font-style: italic;
+}
+
+p > button {
+  margin-left: 0.5rem;
+}

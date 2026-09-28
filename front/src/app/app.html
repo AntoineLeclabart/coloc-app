@@ -1,0 +1,17 @@
+<header>
+  <h1>Coloc</h1>
+  <nav>
+    <a routerLink="/bilan" routerLinkActive="actif">Bilan</a>
+    <a routerLink="/depenses" routerLinkActive="actif">Dépenses</a>
+    <a routerLink="/absences" routerLinkActive="actif">Absences</a>
+    <a routerLink="/reglages" routerLinkActive="actif">Réglages</a>
+  </nav>
+  <div class="mois">
+    <button type="button" (click)="mois.decaler(-1)" aria-label="Mois précédent">‹</button>
+    <span>{{ mois.libelle() }}</span>
+    <button type="button" (click)="mois.decaler(1)" aria-label="Mois suivant">›</button>
+  </div>
+</header>
+<main>
+  <router-outlet />
+</main>

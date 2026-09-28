@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Coloc;
+namespace App\Service;
 
 use DateTimeImmutable;
 
@@ -16,8 +16,8 @@ use DateTimeImmutable;
 final class Calcul
 {
     /**
-     * @param array<string, array{debut: string, fin: string}[]> $absences   membre => périodes d'absence (dates incluses)
-     * @param string[]                                          $membres
+     * @param array<int|string, array{debut: string, fin: string}[]> $absences membre => périodes d'absence (dates incluses)
+     * @param array<int|string>                                       $membres
      */
     public function __construct(
         private array $membres,
@@ -25,7 +25,7 @@ final class Calcul
     ) {}
 
     /** Nombre de jours de présence d'un membre entre $debut et $fin inclus. */
-    public function joursPresence(string $membre, string $debut, string $fin): int
+    public function joursPresence(int|string $membre, string $debut, string $fin): int
     {
         $d = new DateTimeImmutable($debut);
         $f = new DateTimeImmutable($fin);

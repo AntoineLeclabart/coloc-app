@@ -1,0 +1,35 @@
+<section class="carte">
+  <h2>Déclarer une absence</h2>
+  <form class="ligne" (ngSubmit)="ajouter()" #f="ngForm">
+    <label>
+      Qui
+      <select name="membre" [(ngModel)]="membreId" required>
+        @for (m of membres.value(); track m.id) {
+          <option [ngValue]="m.id">{{ m.nom }}</option>
+        }
+      </select>
+    </label>
+    <label>À partir de la semaine du <input type="date" name="date" [(ngModel)]="date" required /></label>
+    <label>Nombre de semaines <input type="number" name="nombre" [(ngModel)]="nombre" min="1" max="52" required /></label>
+    <button class="principal" [disabled]="f.invalid">Ajouter</button>
+  </form>
+  <p>Du {{ jour(apercu().debut) }} au {{ jour(apercu().fin) }} inclus.</p>
+  <p class="vide">
+    Les dépenses variables du mois sont réparties au prorata des jours de présence. Les dépenses fixes ne changent pas.
+  </p>
+  @if (erreur()) {
+    <p class="erreur">{{ erreur() }}</p>
+  }
+</section>
+
+<section class="carte">
+  <h2>Absences déclarées</h2>
+  @for (a of absences.value(); track a.id) {
+    <p>
+      <strong>{{ noms()[a.membreId] }}</strong> : du {{ jour(a.debut) }} au {{ jour(a.fin) }}
+      <button type="button" class="discret" (click)="supprimer(a.id)" aria-label="Supprimer">✕</button>
+    </p>
+  } @empty {
+    <p class="vide">Aucune absence.</p>
+  }
+</section>
