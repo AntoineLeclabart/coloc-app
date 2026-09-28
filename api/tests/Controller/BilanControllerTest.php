@@ -2,32 +2,8 @@
 
 namespace App\Tests\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-class BilanControllerTest extends WebTestCase
+class BilanControllerTest extends ApiTestCase
 {
-    private KernelBrowser $client;
-
-    protected function setUp(): void
-    {
-        // Base SQLite neuve pour chaque test.
-        @unlink(\dirname(__DIR__, 2).'/var/data_test.db');
-        $this->client = static::createClient();
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        (new SchemaTool($em))->createSchema($em->getMetadataFactory()->getAllMetadata());
-    }
-
-    private function post(string $url, array $data): array
-    {
-        $this->client->jsonRequest('POST', $url, $data);
-        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
-
-        return json_decode($this->client->getResponse()->getContent(), true);
-    }
-
     public function testBilanDuMoisAvecAbsenceEtRemboursement(): void
     {
         $alice = $this->post('/api/membres', ['nom' => 'Alice'])['id'];
@@ -83,6 +59,23 @@ class BilanControllerTest extends WebTestCase
         $this->client->request('GET', '/api/bilan/2026-02');
         $bilan = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertSame([(string) $alice => 60000, (string) $bob => 30000], $bilan['depenses'][0]['parts']);
+    }
+
+    public function testModifierUneDepense(): void
+    {
+        $alice = $this->post('/api/membres', ['nom' => 'Alice'])['id'];
+        $bob = $this->post('/api/membres', ['nom' => 'Bob'])['id'];
+        $courses = $this->post('/api/categories', ['nom' => 'Courses', 'type' => 'variable'])['id'];
+        $id = $this->post('/api/depenses', ['libelle' => 'Courses', 'montant' => 1000, 'payeurId' => $alice, 'categorieId' => $courses, 'date' => '2026-02-15'])['id'];
+
+        $this->client->jsonRequest('PUT', '/api/depenses/'.$id, ['libelle' => 'Courses Lidl', 'montant' => 4000, 'payeurId' => $bob, 'categorieId' => $courses, 'date' => '2026-03-02', 'participantIds' => [$bob]]);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertSame([], $this->get('/api/depenses?mois=2026-02'));
+        $this->assertSame([[
+            'id' => $id, 'libelle' => 'Courses Lidl', 'montant' => 4000, 'payeurId' => $bob,
+            'categorieId' => $courses, 'date' => '2026-03-02', 'participantIds' => [$bob],
+        ]], $this->get('/api/depenses?mois=2026-03'));
     }
 
     public function testValidation(): void

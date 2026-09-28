@@ -77,6 +77,19 @@ class Depense implements \JsonSerializable
         return $this->participants->toArray();
     }
 
+    /**
+     * @param Membre[] $participants
+     */
+    public function modifier(string $libelle, int $montant, Membre $payeur, Categorie $categorie, \DateTimeImmutable $date, array $participants): void
+    {
+        $this->libelle = $libelle;
+        $this->montant = $montant;
+        $this->payeur = $payeur;
+        $this->categorie = $categorie;
+        $this->date = $date;
+        $this->participants = new ArrayCollection($participants);
+    }
+
     public function jsonSerialize(): array
     {
         return [
