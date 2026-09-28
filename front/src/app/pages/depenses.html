@@ -1,0 +1,78 @@
+<section class="carte">
+  <h2>Nouvelle dépense</h2>
+  <form class="ligne" (ngSubmit)="ajouter()" #f="ngForm">
+    <label>Libellé <input name="libelle" [(ngModel)]="libelle" required /></label>
+    <label>Montant (€) <input name="montant" [(ngModel)]="montant" inputmode="decimal" required pattern="^\d+([.,]\d{1,2})?$" size="8" /></label>
+    <label>
+      Payé par
+      <select name="payeur" [(ngModel)]="payeurId" required>
+        @for (m of membres.value(); track m.id) {
+          <option [ngValue]="m.id">{{ m.nom }}</option>
+        }
+      </select>
+    </label>
+    <label>
+      Catégorie
+      <select name="categorie" [(ngModel)]="categorieId" required>
+        @for (c of categories.value(); track c.id) {
+          <option [ngValue]="c.id">{{ c.nom }} ({{ c.type }})</option>
+        }
+      </select>
+    </label>
+    <label>Date <input type="date" name="date" [(ngModel)]="date" required /></label>
+    <button class="principal" [disabled]="f.invalid">Ajouter</button>
+  </form>
+  @if (membres.value()?.length) {
+    <p>
+      Pour :
+      @for (m of membres.value(); track m.id) {
+        <label><input type="checkbox" [checked]="!exclus().has(m.id)" (change)="basculer(m.id)" /> {{ m.nom }}</label>
+        &nbsp;
+      }
+    </p>
+  } @else {
+    <p class="vide">Ajoute d'abord les colocs et les catégories dans Réglages.</p>
+  }
+  @if (erreur()) {
+    <p class="erreur">{{ erreur() }}</p>
+  }
+</section>
+
+<section class="carte">
+  <h2>Dépenses de {{ mois.libelle() }}</h2>
+  @if (depenses.value()?.length) {
+    <div class="tableau">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Libellé</th>
+            <th>Catégorie</th>
+            <th>Payé par</th>
+            <th class="nombre">Montant</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of depenses.value(); track d.id) {
+            <tr>
+              <td>{{ d.date.slice(8) }}/{{ d.date.slice(5, 7) }}</td>
+              <td>
+                {{ d.libelle }}
+                @if (d.participantIds.length) {
+                  <br /><small>pour {{ d.participantIds.length }} personne(s)</small>
+                }
+              </td>
+              <td><span class="badge" [class]="cats()[d.categorieId]?.type">{{ cats()[d.categorieId]?.nom }}</span></td>
+              <td>{{ noms()[d.payeurId] }}</td>
+              <td class="nombre">{{ d.montant | euros }}</td>
+              <td><button type="button" class="discret" (click)="supprimer(d.id)" aria-label="Supprimer">✕</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <p class="vide">Aucune dépense ce mois-ci.</p>
+  }
+</section>

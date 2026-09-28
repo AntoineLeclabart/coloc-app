@@ -35,14 +35,10 @@ Courses : 4 + 2 + 4 = 10 semaines de présence, donc 60 € la semaine-personne.
 
 Remboursements : Bob verse 600 € à Alice, Chloé verse 150 € à Alice.
 
-## Stack proposée
+## Stack
 
-- **Back** : PHP 8 sans framework (ou Slim si besoin de routes propres), PDO + SQLite, une petite API JSON.
-- **Front** : TypeScript + Vite, sans framework lourd (ou Preact). Écrans : dépenses, absences, soldes et remboursements.
-- **Hébergement** : n'importe quel hébergement PHP mutualisé ou un Raspberry Pi. Accès protégé par un mot de passe partagé, suffisant pour une coloc.
+- **API** (`api/`) : Symfony 8.1, Doctrine ORM, SQLite (un seul fichier `api/var/data_dev.db`). Le calcul est dans `api/src/Service/Calcul.php`, le bilan mensuel dans `api/src/Service/Bilan.php`.
+- **Front** (`front/`) : Angular 21, composants standalone et signals. Écrans : Bilan, Dépenses, Absences, Réglages.
+- **Docker** : `compose.yaml` à la racine lance l'API (port 8000) et le front (port 4200).
 
-## Fichiers
-
-- `src/Calcul.php` : moteur de calcul (parts, soldes, remboursements).
-- `tests/calcul_test.php` : tests, dont l'exemple ci-dessus (`php tests/calcul_test.php`).
-- `schema.sql` : modèle de données SQLite.
+Voir le README pour lancer le projet.

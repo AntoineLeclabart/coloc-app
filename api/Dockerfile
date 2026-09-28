@@ -1,0 +1,12 @@
+FROM php:8.4-cli-alpine
+
+# pdo_sqlite est inclus dans l'image officielle.
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+EXPOSE 8000
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
