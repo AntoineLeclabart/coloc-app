@@ -8,23 +8,27 @@ import { Auth } from '../auth';
   imports: [FormsModule],
   template: `
     <section class="carte connexion">
-      <h2>Mot de passe de la coloc</h2>
-      <form class="ligne" (ngSubmit)="valider()">
+      <h1>Coloc</h1>
+      <form class="champs" (ngSubmit)="valider()">
         <label>
-          Mot de passe
+          Mot de passe de la coloc
           <input type="password" name="motDePasse" [(ngModel)]="motDePasse" autocomplete="current-password" required autofocus />
         </label>
-        <button class="principal" [disabled]="!motDePasse() || enCours()">Entrer</button>
+        @if (erreur()) {
+          <p class="erreur">Mot de passe incorrect.</p>
+        }
+        <button class="principal large" [disabled]="!motDePasse() || enCours()">Entrer</button>
       </form>
-      @if (erreur()) {
-        <p class="erreur">Mot de passe incorrect.</p>
-      }
     </section>
   `,
   styles: `
     .connexion {
       max-width: 420px;
-      margin: 3rem auto;
+      margin: 15vh auto 0;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 1.6rem;
     }
   `,
 })

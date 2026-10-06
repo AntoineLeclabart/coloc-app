@@ -1,6 +1,6 @@
 <section class="carte">
   <h2>Déclarer une absence</h2>
-  <form class="ligne" (ngSubmit)="ajouter()" #f="ngForm">
+  <form class="champs" (ngSubmit)="ajouter()" #f="ngForm">
     <label>
       Qui
       <select name="membre" [(ngModel)]="membreId" required>
@@ -9,27 +9,38 @@
         }
       </select>
     </label>
-    <label>À partir de la semaine du <input type="date" name="date" [(ngModel)]="date" required /></label>
-    <label>Nombre de semaines <input type="number" name="nombre" [(ngModel)]="nombre" min="1" max="52" required /></label>
-    <button class="principal" [disabled]="f.invalid">Ajouter</button>
+    <div class="deux">
+      <label>Semaine du <input type="date" name="date" [(ngModel)]="date" required /></label>
+      <label>Semaines <input type="number" name="nombre" [(ngModel)]="nombre" min="1" max="52" inputmode="numeric" required /></label>
+    </div>
+    <p class="aide">Du {{ jour(apercu().debut) }} au {{ jour(apercu().fin) }} inclus.</p>
+    @if (erreur()) {
+      <p class="erreur">{{ erreur() }}</p>
+    }
+    <button class="principal large" [disabled]="f.invalid">Ajouter l'absence</button>
   </form>
-  <p>Du {{ jour(apercu().debut) }} au {{ jour(apercu().fin) }} inclus.</p>
-  <p class="vide">
+  <p class="aide">
     Les dépenses variables du mois sont réparties au prorata des jours de présence. Les dépenses fixes ne changent pas.
   </p>
-  @if (erreur()) {
-    <p class="erreur">{{ erreur() }}</p>
-  }
 </section>
 
 <section class="carte">
   <h2>Absences déclarées</h2>
-  @for (a of absences.value(); track a.id) {
-    <p>
-      <strong>{{ noms()[a.membreId] }}</strong> : du {{ jour(a.debut) }} au {{ jour(a.fin) }}
-      <button type="button" class="discret" (click)="supprimer(a.id)" aria-label="Supprimer">✕</button>
-    </p>
-  } @empty {
+  @if (absences.value()?.length) {
+    <ul class="liste">
+      @for (a of absences.value(); track a.id) {
+        <li>
+          <div class="texte">
+            <strong>{{ noms()[a.membreId] }}</strong>
+            <small>Du {{ jour(a.debut) }} au {{ jour(a.fin) }}</small>
+          </div>
+          <button type="button" class="icone" (click)="supprimer(a.id)" [attr.aria-label]="'Supprimer l\'absence de ' + noms()[a.membreId]">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg>
+          </button>
+        </li>
+      }
+    </ul>
+  } @else {
     <p class="vide">Aucune absence.</p>
   }
 </section>
