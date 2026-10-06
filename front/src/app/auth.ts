@@ -12,6 +12,11 @@ export class Auth {
     return this.http.post('/api/login', { username: 'coloc', password: motDePasse });
   }
 
+  /** Les autres appareils sont déconnectés, celui-ci reste connecté. */
+  changerMotDePasse(actuel: string, nouveau: string): Observable<unknown> {
+    return this.http.put('/api/mot-de-passe', { actuel, nouveau });
+  }
+
   deconnexion(): Observable<unknown> {
     return this.http.post('/api/logout', null);
   }

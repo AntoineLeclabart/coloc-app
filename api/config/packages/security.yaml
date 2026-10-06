@@ -7,9 +7,7 @@ security:
     providers:
         # Un seul compte partagé par toute la coloc.
         coloc:
-            memory:
-                users:
-                    coloc: { password: '%env(COLOC_MOT_DE_PASSE_HASH)%', roles: ['ROLE_USER'] }
+            id: App\Security\ColocUserProvider
 
     firewalls:
         dev:

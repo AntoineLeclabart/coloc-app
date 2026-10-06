@@ -1,7 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Api, Categorie, TypeCategorie } from '../api';
+import { Auth } from '../auth';
 
 @Component({
   selector: 'app-reglages',
@@ -32,10 +34,14 @@ import { Api, Categorie, TypeCategorie } from '../api';
     .ajout-categorie {
       margin-top: 1rem;
     }
+    .champs p {
+      margin: 0;
+    }
   `,
 })
 export class ReglagesPage {
   private api = inject(Api);
+  private auth = inject(Auth);
 
   protected membres = rxResource({ stream: () => this.api.membres() });
   protected categories = rxResource({ stream: () => this.api.categories() });
@@ -44,6 +50,14 @@ export class ReglagesPage {
   protected nouvelleCategorie = signal('');
   protected nouveauType = signal<TypeCategorie>('variable');
   protected erreur = signal('');
+
+  protected motDePasseActuel = signal('');
+  protected nouveauMotDePasse = signal('');
+  protected confirmation = signal('');
+  protected motDePasseEnCours = signal(false);
+  protected motDePasseErreur = signal('');
+  protected motDePasseChange = signal(false);
+  protected confirmationDifferente = computed(() => !!this.confirmation() && this.confirmation() !== this.nouveauMotDePasse());
 
   protected ajouterMembre(): void {
     this.api.creerMembre(this.nouveauMembre()).subscribe({
@@ -87,5 +101,26 @@ export class ReglagesPage {
         error: () => this.erreur.set('Impossible : des dépenses utilisent cette catégorie.'),
       });
     }
+  }
+
+  protected changerMotDePasse(): void {
+    this.motDePasseEnCours.set(true);
+    this.motDePasseErreur.set('');
+    this.motDePasseChange.set(false);
+    this.auth.changerMotDePasse(this.motDePasseActuel(), this.nouveauMotDePasse()).subscribe({
+      next: () => {
+        this.motDePasseActuel.set('');
+        this.nouveauMotDePasse.set('');
+        this.confirmation.set('');
+        this.motDePasseChange.set(true);
+        this.motDePasseEnCours.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        // Erreurs de validation de Symfony : { violations: [{ title }] }
+        const violations: { title: string }[] = err.error?.violations ?? [];
+        this.motDePasseErreur.set(violations.map((v) => v.title).join(' ') || 'Impossible de changer le mot de passe.');
+        this.motDePasseEnCours.set(false);
+      },
+    });
   }
 }

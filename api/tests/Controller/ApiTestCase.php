@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Security\ColocUserProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -13,13 +14,20 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function setUp(): void
     {
-        // Base SQLite neuve pour chaque test.
+        $this->client = static::creerClientAvecBaseNeuve();
+        $coloc = static::getContainer()->get(ColocUserProvider::class)->loadUserByIdentifier('coloc');
+        $this->client->loginUser($coloc);
+    }
+
+    /** Client de test avec une base SQLite neuve. */
+    public static function creerClientAvecBaseNeuve(): KernelBrowser
+    {
         @unlink(\dirname(__DIR__, 2).'/var/data_test.db');
-        $this->client = static::createClient();
+        $client = static::createClient();
         $em = static::getContainer()->get(EntityManagerInterface::class);
         (new SchemaTool($em))->createSchema($em->getMetadataFactory()->getAllMetadata());
-        $coloc = static::getContainer()->get('security.user.provider.concrete.coloc')->loadUserByIdentifier('coloc');
-        $this->client->loginUser($coloc);
+
+        return $client;
     }
 
     protected function post(string $url, array $data): array

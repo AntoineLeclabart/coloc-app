@@ -19,19 +19,9 @@ Les données sont dans `api/var/data_dev.db` (SQLite).
 
 ## Mot de passe
 
-Toute la coloc partage un seul mot de passe, et chaque appareil reste connecté un an. Pour le changer (à faire avant de rendre l'appli accessible hors de chez vous) :
+Toute la coloc partage un seul mot de passe, et chaque appareil reste connecté un an. Pour le changer (à faire avant de rendre l'appli accessible hors de chez vous) : **Réglages > Mot de passe**. Les autres appareils sont alors déconnectés ; celui sur lequel on l'a changé reste connecté.
 
-```sh
-docker compose exec api php bin/console security:hash-password
-```
-
-Puis mettre le hash obtenu dans `api/.env.local` (non versionné), entre apostrophes :
-
-```sh
-COLOC_MOT_DE_PASSE_HASH='$2y$13$...'
-```
-
-Changer le mot de passe déconnecte tous les appareils.
+Le nouveau mot de passe est enregistré (haché) dans la base. Tant qu'il n'a jamais été changé, c'est celui de `COLOC_MOT_DE_PASSE_HASH` qui s'applique (`coloc` par défaut, voir `api/.env`).
 
 ## Sans Docker
 
@@ -53,6 +43,7 @@ cd front && npx ng test --watch=false
 |---|---|---|
 | POST | `/api/login` | connexion (`{"username": "coloc", "password": "..."}`) |
 | POST | `/api/logout` | déconnexion |
+| PUT | `/api/mot-de-passe` | changer le mot de passe (`{"actuel": "...", "nouveau": "..."}`) |
 | GET/POST | `/api/membres` | colocs |
 | GET/POST/DELETE | `/api/absences` | absences (dates incluses) |
 | GET/POST/PUT/DELETE | `/api/categories` | catégories `fixe` ou `variable`, poids par coloc |

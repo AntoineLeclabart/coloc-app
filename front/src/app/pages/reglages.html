@@ -73,3 +73,37 @@
     <button class="principal large" [disabled]="!nouvelleCategorie().trim()">Ajouter la catégorie</button>
   </form>
 </section>
+
+<section class="carte">
+  <h2>Mot de passe</h2>
+  <p class="aide">Le mot de passe est partagé par toute la coloc. Le changer déconnecte les autres appareils.</p>
+  <form class="champs" (ngSubmit)="changerMotDePasse()">
+    <label>
+      Mot de passe actuel
+      <input type="password" name="actuel" [(ngModel)]="motDePasseActuel" autocomplete="current-password" required />
+    </label>
+    <label>
+      Nouveau mot de passe (6 caractères minimum)
+      <input type="password" name="nouveau" [(ngModel)]="nouveauMotDePasse" autocomplete="new-password" minlength="6" required />
+    </label>
+    <label>
+      Confirmer le nouveau mot de passe
+      <input type="password" name="confirmation" [(ngModel)]="confirmation" autocomplete="new-password" required />
+    </label>
+    @if (confirmationDifferente()) {
+      <p class="erreur">Les deux mots de passe ne correspondent pas.</p>
+    }
+    @if (motDePasseErreur()) {
+      <p class="erreur">{{ motDePasseErreur() }}</p>
+    }
+    @if (motDePasseChange()) {
+      <p class="positif">Mot de passe changé. Pensez à le donner aux autres colocs.</p>
+    }
+    <button
+      class="principal large"
+      [disabled]="!motDePasseActuel() || nouveauMotDePasse().length < 6 || confirmation() !== nouveauMotDePasse() || motDePasseEnCours()"
+    >
+      Changer le mot de passe
+    </button>
+  </form>
+</section>
