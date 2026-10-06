@@ -1,5 +1,5 @@
 :root {
-  --fond: #f6f7f9;
+  --fond: #f3f4f7;
   --surface: #ffffff;
   --bord: #e2e5ea;
   --texte: #1c2330;
@@ -9,13 +9,14 @@
   --positif: #1d8a4e;
   --negatif: #c2412d;
   --fixe: #7b5bd6;
-  --variable: #d98a1c;
+  --variable: #b86f0e;
+  --ombre: 0 8px 24px rgb(16 24 40 / 0.18);
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fond: #14171c;
+    --fond: #121418;
     --surface: #1d2129;
     --bord: #313743;
     --texte: #e6e9ef;
@@ -26,6 +27,7 @@
     --negatif: #f0826f;
     --fixe: #a98ff0;
     --variable: #f0b45c;
+    --ombre: 0 8px 24px rgb(0 0 0 / 0.5);
   }
 }
 
@@ -33,65 +35,171 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
   background: var(--fond);
   color: var(--texte);
+  overscroll-behavior-y: none;
 }
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--texte-doux);
+}
+
+/* Icônes au trait (onglets, corbeilles…). */
+svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- Cartes et listes ---- */
 
 section.carte {
+  overflow: hidden;
   background: var(--surface);
   border: 1px solid var(--bord);
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+}
 
-  h2 {
-    margin: 0 0 0.75rem;
-    font-size: 1.05rem;
+/* Liste de lignes tactiles : titre + détail à gauche, valeur à droite. */
+.liste {
+  margin: 0 -1rem;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 56px;
+    padding: 0.6rem 1rem;
+    border-top: 1px solid var(--bord);
+  }
+
+  button.ligne-bouton {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.liste > li:has(> button.ligne-bouton:active) {
+  background: var(--accent-fond);
+}
 
-  th,
-  td {
-    padding: 0.45rem 0.5rem;
-    border-bottom: 1px solid var(--bord);
-    text-align: left;
+.texte {
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    display: block;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  th {
-    font-weight: 600;
+  small {
+    display: block;
     color: var(--texte-doux);
     font-size: 0.85rem;
   }
+}
 
-  .nombre {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
+.valeur {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  text-align: right;
+
+  small {
+    display: block;
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: var(--texte-doux);
   }
 }
 
-.tableau {
-  overflow-x: auto;
+.tuiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+
+  div {
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    background: var(--fond);
+  }
+
+  span {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--texte-doux);
+  }
+
+  strong {
+    font-size: 1.1rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .badge {
+    display: table;
+    margin-bottom: 0.2rem;
+  }
 }
 
-form.ligne {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: end;
+/* ---- Formulaires ---- */
+
+.champs {
+  display: grid;
+  gap: 0.75rem;
 
   label {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.3rem;
     font-size: 0.85rem;
+    font-weight: 500;
     color: var(--texte-doux);
+  }
+
+  .etiquette {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--texte-doux);
+  }
+
+  .deux {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 }
 
@@ -99,20 +207,57 @@ input,
 select,
 button {
   font: inherit;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid var(--bord);
-  border-radius: 6px;
-  background: var(--surface);
+  /* 16px minimum : sinon iOS zoome à la saisie. */
+  font-size: 16px;
   color: var(--texte);
 }
 
+input,
+select {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--bord);
+  border-radius: 10px;
+  background: var(--surface);
+
+  &:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+  }
+}
+
+input.montant {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
 button {
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--bord);
+  border-radius: 10px;
+  background: var(--surface);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 
   &.principal {
     background: var(--accent);
     border-color: var(--accent);
     color: #fff;
+    font-weight: 600;
+  }
+
+  &.danger {
+    color: var(--negatif);
+    border-color: var(--negatif);
+    background: none;
   }
 
   &.discret {
@@ -120,14 +265,182 @@ button {
     background: none;
     color: var(--texte-doux);
   }
+
+  &.icone {
+    display: inline-grid;
+    place-items: center;
+    min-width: 44px;
+    padding: 0;
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    color: var(--texte-doux);
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  &.large {
+    width: 100%;
+    min-height: 48px;
+  }
 }
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+
+  button {
+    flex: 1;
+    min-height: 48px;
+  }
+}
+
+/* Champ + bouton sur une ligne (ajout rapide). */
+.en-ligne {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+
+  input {
+    flex: 1;
+  }
+
+  button {
+    min-height: 48px;
+  }
+}
+
+/* Pastilles à cocher (participants). */
+.pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  label {
+    flex-direction: row;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 0.9rem;
+    border: 1px solid var(--bord);
+    border-radius: 999px;
+    color: var(--texte);
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  label:has(input:checked) {
+    background: var(--accent-fond);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+  }
+}
+
+/* ---- Bouton flottant et feuille du bas ---- */
+
+.fab {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(56px + 1rem + env(safe-area-inset-bottom));
+  z-index: 11;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  box-shadow: var(--ombre);
+}
+
+@media (min-width: 768px) {
+  .fab {
+    bottom: 2rem;
+    right: max(1rem, calc(50vw - 320px - 72px));
+  }
+}
+
+.voile {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgb(0 0 0 / 0.4);
+  animation: apparition 0.15s ease-out;
+}
+
+.feuille {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 21;
+  max-width: 640px;
+  max-height: 92dvh;
+  margin: 0 auto;
+  overflow-y: auto;
+  padding: 0.5rem 1rem calc(1rem + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-radius: 18px 18px 0 0;
+  box-shadow: var(--ombre);
+  animation: montee 0.2s ease-out;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto 0.75rem;
+    border-radius: 2px;
+    background: var(--bord);
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+
+    h2 {
+      margin: 0;
+    }
+  }
+}
+
+@keyframes montee {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---- Divers ---- */
 
 .badge {
   display: inline-block;
-  padding: 0.1rem 0.5rem;
+  padding: 0.05rem 0.5rem;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
+  vertical-align: middle;
 
   &.fixe {
     color: var(--fixe);
@@ -152,11 +465,23 @@ button {
   color: var(--negatif);
 }
 
-.vide {
+.vide,
+.aide {
   color: var(--texte-doux);
+  font-size: 0.9rem;
+}
+
+.vide {
   font-style: italic;
 }
 
-p > button {
-  margin-left: 0.5rem;
+details {
+  > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  > summary::-webkit-details-marker {
+    display: none;
+  }
 }

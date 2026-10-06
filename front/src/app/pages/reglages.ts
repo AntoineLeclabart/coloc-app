@@ -7,6 +7,32 @@ import { Api, Categorie, TypeCategorie } from '../api';
   selector: 'app-reglages',
   imports: [FormsModule],
   templateUrl: './reglages.html',
+  styles: `
+    li.categorie {
+      display: block;
+    }
+    .entete {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .poids {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+      gap: 0.5rem;
+      margin: 0.25rem 0 0.4rem;
+    }
+    .poids label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 0.8rem;
+      color: var(--texte-doux);
+    }
+    .ajout-categorie {
+      margin-top: 1rem;
+    }
+  `,
 })
 export class ReglagesPage {
   private api = inject(Api);

@@ -3,23 +3,33 @@
 }
 @if (bilan.value(); as b) {
   <section class="carte">
-    <h2>Virements à faire</h2>
-    @for (v of b.virements; track $index) {
-      <p>
-        <strong>{{ noms()[v.deId] }}</strong> doit <strong>{{ v.montant | euros }}</strong> à
-        <strong>{{ noms()[v.aId] }}</strong>
-        <button type="button" (click)="marquerPaye(v)">Marquer comme payé</button>
-      </p>
-    } @empty {
+    <h2>À régler ce mois-ci</h2>
+    @if (b.virements.length) {
+      <ul class="liste">
+        @for (v of b.virements; track $index) {
+          <li>
+            <div class="texte">
+              <strong>{{ noms()[v.deId] }} → {{ noms()[v.aId] }}</strong>
+              <small>{{ noms()[v.deId] }} rembourse {{ noms()[v.aId] }}</small>
+            </div>
+            <span class="valeur">{{ v.montant | euros }}</span>
+            <button type="button" (click)="marquerPaye(v)">Payé</button>
+          </li>
+        }
+      </ul>
+    } @else {
       <p class="vide">Tout est réglé pour ce mois.</p>
     }
     @if (b.remboursements.length) {
       <h3>Déjà payé</h3>
-      <ul>
+      <ul class="liste">
         @for (r of b.remboursements; track r.id) {
           <li>
-            {{ noms()[r.deId] }} → {{ noms()[r.aId] }} : {{ r.montant | euros }}
-            <button type="button" class="discret" (click)="annulerRemboursement(r.id)">annuler</button>
+            <div class="texte">
+              <strong>{{ noms()[r.deId] }} → {{ noms()[r.aId] }}</strong>
+            </div>
+            <span class="valeur positif">{{ r.montant | euros }}</span>
+            <button type="button" class="discret" (click)="annulerRemboursement(r.id)">Annuler</button>
           </li>
         }
       </ul>
@@ -27,70 +37,55 @@
   </section>
 
   <section class="carte">
-    <h2>Soldes du mois</h2>
-    <div class="tableau">
-      <table>
-        <thead>
-          <tr>
-            <th>Coloc</th>
-            <th class="nombre">Présence</th>
-            <th class="nombre">Solde</th>
-            <th class="nombre">Reste à régler</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (m of b.membres; track m.id) {
-            <tr>
-              <td>{{ m.nom }}</td>
-              <td class="nombre">{{ m.joursPresence }} / {{ b.joursDansLeMois }} j</td>
-              <td class="nombre" [class.positif]="b.soldes[m.id] > 0" [class.negatif]="b.soldes[m.id] < 0">
-                {{ b.soldes[m.id] | euros }}
-              </td>
-              <td class="nombre" [class.positif]="b.soldesRestants[m.id] > 0" [class.negatif]="b.soldesRestants[m.id] < 0">
-                {{ b.soldesRestants[m.id] | euros }}
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <h2>Soldes</h2>
+    <ul class="liste">
+      @for (m of b.membres; track m.id) {
+        <li>
+          <div class="texte">
+            <strong>{{ m.nom }}</strong>
+            <small>Présent {{ m.joursPresence }} j sur {{ b.joursDansLeMois }}</small>
+          </div>
+          <span class="valeur" [class.positif]="b.soldesRestants[m.id] > 0" [class.negatif]="b.soldesRestants[m.id] < 0">
+            {{ b.soldesRestants[m.id] | euros }}
+            @if (b.soldesRestants[m.id] !== b.soldes[m.id]) {
+              <small>sur {{ b.soldes[m.id] | euros }}</small>
+            }
+          </span>
+        </li>
+      }
+    </ul>
+    <div class="tuiles">
+      <div><span class="badge fixe">fixe</span> <strong>{{ b.totaux.fixe | euros }}</strong></div>
+      <div><span class="badge variable">variable</span> <strong>{{ b.totaux.variable | euros }}</strong></div>
     </div>
-    <p>
-      <span class="badge fixe">fixe</span> {{ b.totaux.fixe | euros }}
-      &nbsp;
-      <span class="badge variable">variable</span> {{ b.totaux.variable | euros }}
-    </p>
   </section>
 
   <section class="carte">
     <h2>Détail des parts</h2>
     @if (b.depenses.length) {
-      <div class="tableau">
-        <table>
-          <thead>
-            <tr>
-              <th>Dépense</th>
-              <th class="nombre">Montant</th>
-              @for (m of b.membres; track m.id) {
-                <th class="nombre">{{ m.nom }}</th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-            @for (l of b.depenses; track l.depense.id) {
-              <tr>
-                <td>
-                  {{ l.depense.libelle }} <span class="badge" [class]="l.type">{{ l.type }}</span>
-                  <br /><small>payé par {{ noms()[l.depense.payeurId] }}</small>
-                </td>
-                <td class="nombre">{{ l.depense.montant | euros }}</td>
+      <ul class="liste">
+        @for (l of b.depenses; track l.depense.id) {
+          <li class="detail">
+            <details>
+              <summary>
+                <div class="texte">
+                  <strong>{{ l.depense.libelle }}</strong>
+                  <small><span class="badge" [class]="l.type">{{ l.type }}</span> payé par {{ noms()[l.depense.payeurId] }}</small>
+                </div>
+                <span class="valeur">{{ l.depense.montant | euros }}</span>
+              </summary>
+              <dl>
                 @for (m of b.membres; track m.id) {
-                  <td class="nombre">{{ l.parts[m.id] === undefined ? '—' : (l.parts[m.id] | euros) }}</td>
+                  @if (l.parts[m.id] !== undefined) {
+                    <dt>{{ m.nom }}</dt>
+                    <dd>{{ l.parts[m.id] | euros }}</dd>
+                  }
                 }
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+              </dl>
+            </details>
+          </li>
+        }
+      </ul>
     } @else {
       <p class="vide">Aucune dépense ce mois-ci.</p>
     }

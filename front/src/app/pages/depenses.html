@@ -1,16 +1,69 @@
 <section class="carte">
-  <h2>{{ enEdition() === null ? 'Nouvelle dépense' : 'Modifier la dépense' }}</h2>
-  <form class="ligne" (ngSubmit)="enregistrer()" #f="ngForm">
-    <label>Libellé <input name="libelle" [(ngModel)]="libelle" required /></label>
-    <label>Montant (€) <input name="montant" [(ngModel)]="montant" inputmode="decimal" required pattern="^\d+([.,]\d{1,2})?$" size="8" /></label>
+  <h2>Dépenses du mois</h2>
+  @if (depenses.value()?.length) {
+    <div class="tuiles total">
+      <div>
+        <span>Total</span>
+        <strong>{{ total() | euros }}</strong>
+      </div>
+      <div>
+        <span>Nombre</span>
+        <strong>{{ depenses.value()!.length }}</strong>
+      </div>
+    </div>
+    <ul class="liste">
+      @for (d of depenses.value(); track d.id) {
+        <li>
+          <button type="button" class="ligne-bouton" (click)="editer(d)" [attr.aria-label]="'Modifier ' + d.libelle">
+            <div class="texte">
+              <strong>{{ d.libelle }}</strong>
+              <small>
+                {{ jour(d.date) }} · {{ noms()[d.payeurId] }}
+                @if (d.participantIds.length) {
+                  · pour {{ d.participantIds.length }}
+                }
+              </small>
+            </div>
+            <span class="valeur">
+              {{ d.montant | euros }}
+              <small><span class="badge" [class]="cats()[d.categorieId]?.type">{{ cats()[d.categorieId]?.nom }}</span></small>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  } @else if (membres.value()?.length === 0 || categories.value()?.length === 0) {
+    <p class="vide">Ajoute d'abord les colocs et les catégories dans Réglages.</p>
+  } @else {
+    <p class="vide">Aucune dépense ce mois-ci. Appuie sur + pour en ajouter une.</p>
+  }
+</section>
+
+<button type="button" class="fab" (click)="ouvrir()" aria-label="Ajouter une dépense">+</button>
+
+@if (feuilleOuverte()) {
+  <div class="voile" (click)="fermer()"></div>
+  <form class="feuille champs" role="dialog" aria-modal="true" aria-labelledby="titre-depense" (ngSubmit)="enregistrer()" #f="ngForm">
+    <header>
+      <h2 id="titre-depense">{{ enEdition() === null ? 'Nouvelle dépense' : 'Modifier la dépense' }}</h2>
+      <button type="button" class="icone" (click)="fermer()" aria-label="Fermer">×</button>
+    </header>
     <label>
-      Payé par
-      <select name="payeur" [(ngModel)]="payeurId" required>
-        @for (m of membres.value(); track m.id) {
-          <option [ngValue]="m.id">{{ m.nom }}</option>
-        }
-      </select>
+      Montant (€)
+      <input class="montant" name="montant" [(ngModel)]="montant" inputmode="decimal" required pattern="^\d+([.,]\d{1,2})?$" placeholder="0,00" autocomplete="off" />
     </label>
+    <label>Libellé <input name="libelle" [(ngModel)]="libelle" required placeholder="Courses, loyer…" autocomplete="off" /></label>
+    <div class="deux">
+      <label>
+        Payé par
+        <select name="payeur" [(ngModel)]="payeurId" required>
+          @for (m of membres.value(); track m.id) {
+            <option [ngValue]="m.id">{{ m.nom }}</option>
+          }
+        </select>
+      </label>
+      <label>Date <input type="date" name="date" [(ngModel)]="date" required /></label>
+    </div>
     <label>
       Catégorie
       <select name="categorie" [(ngModel)]="categorieId" required>
@@ -19,66 +72,22 @@
         }
       </select>
     </label>
-    <label>Date <input type="date" name="date" [(ngModel)]="date" required /></label>
-    <button class="principal" [disabled]="f.invalid">{{ enEdition() === null ? 'Ajouter' : 'Enregistrer' }}</button>
-    @if (enEdition() !== null) {
-      <button type="button" (click)="annuler()">Annuler</button>
-    }
-  </form>
-  @if (membres.value()?.length) {
-    <p>
-      Pour :
-      @for (m of membres.value(); track m.id) {
-        <label><input type="checkbox" [checked]="!exclus().has(m.id)" (change)="basculer(m.id)" /> {{ m.nom }}</label>
-        &nbsp;
-      }
-    </p>
-  } @else {
-    <p class="vide">Ajoute d'abord les colocs et les catégories dans Réglages.</p>
-  }
-  @if (erreur()) {
-    <p class="erreur">{{ erreur() }}</p>
-  }
-</section>
-
-<section class="carte">
-  <h2>Dépenses de {{ mois.libelle() }}</h2>
-  @if (depenses.value()?.length) {
-    <div class="tableau">
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Libellé</th>
-            <th>Catégorie</th>
-            <th>Payé par</th>
-            <th class="nombre">Montant</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (d of depenses.value(); track d.id) {
-            <tr>
-              <td>{{ d.date.slice(8) }}/{{ d.date.slice(5, 7) }}</td>
-              <td>
-                {{ d.libelle }}
-                @if (d.participantIds.length) {
-                  <br /><small>pour {{ d.participantIds.length }} personne(s)</small>
-                }
-              </td>
-              <td><span class="badge" [class]="cats()[d.categorieId]?.type">{{ cats()[d.categorieId]?.nom }}</span></td>
-              <td>{{ noms()[d.payeurId] }}</td>
-              <td class="nombre">{{ d.montant | euros }}</td>
-              <td>
-                <button type="button" class="discret" (click)="editer(d)" aria-label="Modifier">✎</button>
-                <button type="button" class="discret" (click)="supprimer(d.id)" aria-label="Supprimer">✕</button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <div role="group" aria-labelledby="pour-qui">
+      <span class="etiquette" id="pour-qui">Pour qui</span>
+      <div class="pastilles">
+        @for (m of membres.value(); track m.id) {
+          <label><input type="checkbox" [checked]="!exclus().has(m.id)" (change)="basculer(m.id)" />{{ m.nom }}</label>
+        }
+      </div>
     </div>
-  } @else {
-    <p class="vide">Aucune dépense ce mois-ci.</p>
-  }
-</section>
+    @if (erreur()) {
+      <p class="erreur">{{ erreur() }}</p>
+    }
+    <div class="actions">
+      @if (enEdition() !== null) {
+        <button type="button" class="danger" (click)="supprimer()">Supprimer</button>
+      }
+      <button class="principal" [disabled]="f.invalid">{{ enEdition() === null ? 'Ajouter' : 'Enregistrer' }}</button>
+    </div>
+  </form>
+}

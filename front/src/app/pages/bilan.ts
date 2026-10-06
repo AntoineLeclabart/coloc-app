@@ -8,6 +8,43 @@ import { MoisCourant } from '../mois';
   selector: 'app-bilan',
   imports: [EurosPipe],
   templateUrl: './bilan.html',
+  styles: `
+    li.detail {
+      display: block;
+      padding: 0;
+    }
+    summary {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-height: 56px;
+      padding: 0.6rem 1rem;
+    }
+    summary::after {
+      content: '›';
+      color: var(--texte-doux);
+      font-size: 1.3rem;
+      transition: transform 0.15s;
+    }
+    details[open] summary::after {
+      transform: rotate(90deg);
+    }
+    dl {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.3rem 1rem;
+      margin: 0;
+      padding: 0 2.4rem 0.8rem 1rem;
+    }
+    dt {
+      color: var(--texte-doux);
+    }
+    dd {
+      margin: 0;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  `,
 })
 export class BilanPage {
   private api = inject(Api);

@@ -4,72 +4,72 @@
 
 <section class="carte">
   <h2>Colocs</h2>
-  @for (m of membres.value(); track m.id) {
-    <p>
-      {{ m.nom }}
-      <button type="button" class="discret" (click)="supprimerMembre(m.id)" aria-label="Supprimer">✕</button>
-    </p>
+  @if (membres.value()?.length) {
+    <ul class="liste">
+      @for (m of membres.value(); track m.id) {
+        <li>
+          <div class="texte"><strong>{{ m.nom }}</strong></div>
+          <button type="button" class="icone" (click)="supprimerMembre(m.id)" [attr.aria-label]="'Supprimer ' + m.nom">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg>
+          </button>
+        </li>
+      }
+    </ul>
   }
-  <form class="ligne" (ngSubmit)="ajouterMembre()">
-    <label>Prénom <input name="nom" [(ngModel)]="nouveauMembre" required /></label>
+  <form class="en-ligne" (ngSubmit)="ajouterMembre()">
+    <input name="nom" [(ngModel)]="nouveauMembre" required placeholder="Prénom" aria-label="Prénom du coloc" autocomplete="off" />
     <button class="principal" [disabled]="!nouveauMembre().trim()">Ajouter</button>
   </form>
 </section>
 
 <section class="carte">
   <h2>Catégories</h2>
-  <p class="vide">
-    Fixe : partagée selon les poids ci-dessous (1 = part normale), sans tenir compte des absences.
-    Variable : partagée selon les jours de présence du mois.
+  <p class="aide">
+    <span class="badge fixe">fixe</span> partagée selon les poids (1 = part normale), sans tenir compte des absences.
+    <span class="badge variable">variable</span> partagée selon les jours de présence du mois.
   </p>
-  <div class="tableau">
-    <table>
-      <thead>
-        <tr>
-          <th>Catégorie</th>
-          <th>Type</th>
-          @for (m of membres.value(); track m.id) {
-            <th class="nombre">Poids {{ m.nom }}</th>
-          }
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (c of categories.value(); track c.id) {
-          <tr>
-            <td>{{ c.nom }}</td>
-            <td><span class="badge" [class]="c.type">{{ c.type }}</span></td>
-            @for (m of membres.value(); track m.id) {
-              <td class="nombre">
-                @if (c.type === 'fixe') {
+  @if (categories.value()?.length) {
+    <ul class="liste">
+      @for (c of categories.value(); track c.id) {
+        <li class="categorie">
+          <div class="entete">
+            <div class="texte">
+              <strong>{{ c.nom }}</strong>
+            </div>
+            <span class="badge" [class]="c.type">{{ c.type }}</span>
+            <button type="button" class="icone" (click)="supprimerCategorie(c.id)" [attr.aria-label]="'Supprimer ' + c.nom">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></svg>
+            </button>
+          </div>
+          @if (c.type === 'fixe' && membres.value()?.length) {
+            <div class="poids">
+              @for (m of membres.value(); track m.id) {
+                <label>
+                  {{ m.nom }}
                   <input
                     type="number"
                     min="0"
                     step="0.1"
+                    inputmode="decimal"
                     [value]="poids(c, m.id)"
                     (change)="changerPoids(c, m.id, $any($event.target).value)"
-                    style="width: 5rem"
                   />
-                } @else {
-                  —
-                }
-              </td>
-            }
-            <td><button type="button" class="discret" (click)="supprimerCategorie(c.id)" aria-label="Supprimer">✕</button></td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  <form class="ligne" (ngSubmit)="ajouterCategorie()">
-    <label>Nom <input name="nom" [(ngModel)]="nouvelleCategorie" required /></label>
-    <label>
-      Type
-      <select name="type" [(ngModel)]="nouveauType">
+                </label>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+  <form class="champs ajout-categorie" (ngSubmit)="ajouterCategorie()">
+    <div class="deux">
+      <input name="nom" [(ngModel)]="nouvelleCategorie" required placeholder="Nouvelle catégorie" aria-label="Nom de la catégorie" autocomplete="off" />
+      <select name="type" [(ngModel)]="nouveauType" aria-label="Type de catégorie">
         <option value="variable">variable</option>
         <option value="fixe">fixe</option>
       </select>
-    </label>
-    <button class="principal" [disabled]="!nouvelleCategorie().trim()">Ajouter</button>
+    </div>
+    <button class="principal large" [disabled]="!nouvelleCategorie().trim()">Ajouter la catégorie</button>
   </form>
 </section>
