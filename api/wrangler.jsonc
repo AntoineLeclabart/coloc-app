@@ -1,0 +1,24 @@
+// Configuration du Worker Cloudflare : l'API (src/) et le front Angular compilé (assets).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "coloc",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-15",
+  "assets": {
+    "directory": "../front/dist/front/browser",
+    "binding": "ASSETS",
+    // Les routes Angular (/bilan, /depenses…) renvoient index.html.
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "coloc",
+      // Identifiant donné par `npx wrangler d1 create coloc` (voir DEPLOIEMENT.md).
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "observability": { "enabled": true }
+}
