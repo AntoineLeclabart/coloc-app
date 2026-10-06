@@ -1,0 +1,29 @@
+{
+	frankenphp
+}
+
+# SERVER_NAME : le nom de domaine (ex. coloc-antoine.duckdns.org).
+# Caddy obtient et renouvelle le certificat HTTPS automatiquement.
+{$SERVER_NAME:localhost} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		-Server
+	}
+
+	# API Symfony
+	handle /api/* {
+		root * /app/public
+		php_server
+	}
+
+	# Front Angular : les routes inconnues renvoient index.html.
+	handle {
+		root * /srv/front
+		try_files {path} /index.html
+		file_server
+	}
+}

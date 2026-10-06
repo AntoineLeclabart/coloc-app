@@ -33,6 +33,10 @@ COLOC_MOT_DE_PASSE_HASH='$2y$13$...'
 
 Changer le mot de passe déconnecte tous les appareils.
 
+## Mise en ligne
+
+Pour héberger l'appli gratuitement sur une VM Oracle Cloud, avec HTTPS : voir [DEPLOIEMENT.md](DEPLOIEMENT.md).
+
 ## Sans Docker
 
 ```sh

@@ -1,0 +1,22 @@
+# Production (VM Oracle Cloud) : voir DEPLOIEMENT.md
+#   docker compose -f compose.prod.yaml up -d --build
+services:
+  app:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    env_file: deploy/coloc.env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - donnees:/app/donnees
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  donnees:
+  caddy_data:
+  caddy_config:
