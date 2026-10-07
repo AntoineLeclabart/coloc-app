@@ -1,10 +1,14 @@
 # Environnement de développement : `docker compose up`, puis http://localhost:4200
 services:
   api:
-    build: ./api
+    # Image Debian (pas Alpine) : le moteur workerd de Cloudflare a besoin de glibc.
+    image: node:24
+    working_dir: /app/api
+    command: sh -c "npm ci && npm run dev"
     volumes:
-      - ./api:/app
-      - api_vendor:/app/vendor
+      - ./api:/app/api
+      - ./front/dist:/app/front/dist
+      - api_node_modules:/app/api/node_modules
     ports:
       - "8000:8000"
 
@@ -23,5 +27,5 @@ services:
       - api
 
 volumes:
-  api_vendor:
+  api_node_modules:
   front_node_modules:

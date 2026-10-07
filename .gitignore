@@ -3,4 +3,3 @@
 /dist/
 *.sqlite
 *.db
-/deploy/coloc.env
