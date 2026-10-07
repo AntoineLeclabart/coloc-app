@@ -23,13 +23,9 @@ D'après la documentation Cloudflare (octobre 2026) :
    npx wrangler login      # ouvre le navigateur pour autoriser l'accès à ton compte
    ```
 
-## 2. Créer la base de données (une seule fois)
+## 2. La base de données
 
-```sh
-npx wrangler d1 create coloc
-```
-
-La commande affiche un `database_id`. Copie-le dans `api/wrangler.jsonc` à la place de `00000000-0000-0000-0000-000000000000`. Si Wrangler propose d'ajouter la configuration lui-même, réponds non : elle y est déjà, seul l'identifiant manque. Commite ce changement (l'identifiant n'est pas un secret).
+Elle est déjà créée (`coloc`) et son identifiant est dans `api/wrangler.jsonc`. À refaire seulement sur un autre compte Cloudflare : `npx wrangler d1 create coloc`, puis reporter le `database_id` affiché dans ce fichier.
 
 ## 3. Mettre en ligne
 
