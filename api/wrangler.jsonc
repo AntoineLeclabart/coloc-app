@@ -15,8 +15,8 @@
     {
       "binding": "DB",
       "database_name": "coloc",
-      // Identifiant donné par `npx wrangler d1 create coloc` (voir DEPLOIEMENT.md).
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      // Base créée avec `npx wrangler d1 create coloc` (voir DEPLOIEMENT.md).
+      "database_id": "72ba0c27-4ac1-4578-b6a8-b78319164dff",
       "migrations_dir": "migrations"
     }
   ],
